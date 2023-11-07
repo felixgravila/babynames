@@ -87,13 +87,23 @@ for name, _ in tqdm(nandc[: place + 1]):
 
 # %%
 
+WEIGHTED = True
+aggro = 0.2
+weight_mat = np.linspace(1 - aggro, 1 + aggro, max_year - min_year + 1)
+
 N = len(namesandhgraphs)
 graph = np.zeros((N, N))
 graph_names = [n for (n, _) in namesandhgraphs]
 
 for i in tqdm(range(0, N - 1)):
     for j in range(i + 1, N):
-        graph[i][j] = ((namesandhgraphs[i][1] - namesandhgraphs[j][1]) ** 2).mean()
+        graph[i][j] = (
+            (
+                (namesandhgraphs[i][1] - namesandhgraphs[j][1])
+                * (weight_mat if WEIGHTED else 1)
+            )
+            ** 2
+        ).mean()
         graph[j][i] = graph[i][j]
 
 graph = graph / graph.max()
@@ -120,12 +130,12 @@ for nidx in sgraph[-10:]:
 # %%
 
 
-to_find_name = "Elsa"
-num_to_plot = 10
+to_find_name = "Muriel"
+num_to_plot = 20
 
 to_find_idx = graph_names.index(to_find_name)
 
-plt.figure(figsize=(20, 10), facecolor="white")
+plt.figure(figsize=(12, 10), facecolor="white")
 
 plt.plot(
     range(min_year, max_year + 1), namesandhgraphs[to_find_idx][1], label=to_find_name
