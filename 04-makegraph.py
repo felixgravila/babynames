@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from math import log10, ceil
 import numpy as np
 from tqdm import tqdm
-from multiprocessing import Pool, cpu_count
+import json
 
 # %%
 
@@ -56,7 +56,7 @@ plt.show()
 Show names around cutoff
 """
 
-CUTOFF_COUNT = 10_000
+CUTOFF_COUNT = 50_000
 NUM_NAMES = 50
 
 closest = min(nandc, key=lambda x: abs(x[1] - CUTOFF_COUNT))
@@ -87,7 +87,7 @@ for name, _ in tqdm(nandc[: place + 1]):
 
 # %%
 
-WEIGHTED = True
+WEIGHTED = False
 aggro = 0.2
 weight_mat = np.linspace(1 - aggro, 1 + aggro, max_year - min_year + 1)
 
@@ -130,7 +130,7 @@ for nidx in sgraph[-10:]:
 # %%
 
 
-to_find_name = "Muriel"
+to_find_name = "Stella"
 num_to_plot = 20
 
 to_find_idx = graph_names.index(to_find_name)
@@ -153,5 +153,77 @@ for affine_idx in idxs_ranked[1 : num_to_plot + 1]:
 plt.legend()
 plt.tight_layout()
 plt.show()
+
+# %%
+"""
+Make json dataset for force directed graph
+
+Format:
+{
+    "nodes": [
+        {"id": "Myriel"},
+        {"id": "Napoleon"},
+    ],
+    "links": [
+        {"source": "Napoleon", "target": "Myriel", "value": 1},
+    ],
+}
+"""
+
+data = {
+    "nodes": [{"id": i, "name": n} for (i, n) in enumerate(graph_names)],
+    "links": [],
+}
+
+TOP_PERC_LINKS = 0.05
+links_sorted = np.sort(np.reshape(graph, (-1,)))
+threshold = links_sorted[round(len(links_sorted) * TOP_PERC_LINKS)]
+
+N = len(graph_names)
+for i in tqdm(range(N - 1)):
+    for j in range(i + 1, N):
+        val = graph[i][j]
+        if val < threshold:
+            data["links"].append(
+                {
+                    "source": i,
+                    "target": j,
+                    "value": val,
+                }
+            )
+            # data["links"].append(
+            #     {
+            #         "source": j,
+            #         "target": i,
+            #         "value": val,
+            #     }
+            # )
+
+with open(f"graph_{len(graph_names)}_top{TOP_PERC_LINKS}.json", "w") as f:
+    json.dump(data, f, indent=2)
+
+# %%
+
+
+TOP_TO_TAKE = 3
+
+data = {
+    "nodes": [{"id": i, "name": n} for (i, n) in enumerate(graph_names)],
+    "links": [],
+}
+
+for i in tqdm(range(len(graph_names))):
+    g_sorted = np.argsort(graph[i])
+    for j in g_sorted[1 : TOP_TO_TAKE + 1]:
+        data["links"].append(
+            {
+                "source": int(i),
+                "target": int(j),
+                "value": graph[i][j],
+            }
+        )
+
+with open(f"graph2_{len(graph_names)}_top{TOP_TO_TAKE}.json", "w") as f:
+    json.dump(data, f, indent=2)
 
 # %%
