@@ -36,3 +36,22 @@
     transform: rotate(360deg);
   }
 }
+
+#bigdiv {
+  height: 100%;
+  width: 100%;
+  display: flex;
+}
+
+#graphdiv {
+  height: 100%;
+  width: calc(100% - 150px);
+  flex: 1;
+}
+
+#selectdiv {
+  height: 100%;
+  width: 130px;
+  flex: 1;
+  padding: 10px;
+}

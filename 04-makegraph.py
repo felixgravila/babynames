@@ -9,6 +9,7 @@ import json
 
 # %%
 
+gender = "F"
 
 pigenavne = set(pd.read_csv("pigenavne.csv")["Navn"].to_list())
 drengenavne = set(pd.read_csv("drengenavne.csv")["Navn"].to_list())
@@ -24,9 +25,9 @@ df = df[df["name"].apply(lambda n: n in allenavne)]
 df
 
 # %%
-# Only girls
+# Only 1 gender
 
-df = df[df["gender"] == "F"]
+df = df[df["gender"] == gender]
 df
 
 # %%
@@ -56,7 +57,7 @@ plt.show()
 Show names around cutoff
 """
 
-CUTOFF_COUNT = 50_000
+CUTOFF_COUNT = 10_000
 NUM_NAMES = 50
 
 closest = min(nandc, key=lambda x: abs(x[1] - CUTOFF_COUNT))
@@ -130,29 +131,29 @@ for nidx in sgraph[-10:]:
 # %%
 
 
-to_find_name = "Stella"
-num_to_plot = 20
+# to_find_name = "Stella"
+# num_to_plot = 20
 
-to_find_idx = graph_names.index(to_find_name)
+# to_find_idx = graph_names.index(to_find_name)
 
-plt.figure(figsize=(12, 10), facecolor="white")
+# plt.figure(figsize=(12, 10), facecolor="white")
 
-plt.plot(
-    range(min_year, max_year + 1), namesandhgraphs[to_find_idx][1], label=to_find_name
-)
+# plt.plot(
+#     range(min_year, max_year + 1), namesandhgraphs[to_find_idx][1], label=to_find_name
+# )
 
-idxs_ranked = np.argsort(graph[to_find_idx])  # first one is itself
-for affine_idx in idxs_ranked[1 : num_to_plot + 1]:
-    plt.plot(
-        range(min_year, max_year + 1),
-        namesandhgraphs[affine_idx][1],
-        alpha=0.3,
-        label=graph_names[affine_idx],
-    )
+# idxs_ranked = np.argsort(graph[to_find_idx])  # first one is itself
+# for affine_idx in idxs_ranked[1 : num_to_plot + 1]:
+#     plt.plot(
+#         range(min_year, max_year + 1),
+#         namesandhgraphs[affine_idx][1],
+#         alpha=0.3,
+#         label=graph_names[affine_idx],
+#     )
 
-plt.legend()
-plt.tight_layout()
-plt.show()
+# plt.legend()
+# plt.tight_layout()
+# plt.show()
 
 # %%
 """
@@ -175,6 +176,8 @@ data = {
     "links": [],
 }
 
+links_for_name = {i: 0 for i in range(len(graph_names))}
+
 TOP_PERC_LINKS = 0.05
 links_sorted = np.sort(np.reshape(graph, (-1,)))
 threshold = links_sorted[round(len(links_sorted) * TOP_PERC_LINKS)]
@@ -191,39 +194,21 @@ for i in tqdm(range(N - 1)):
                     "value": val,
                 }
             )
-            # data["links"].append(
-            #     {
-            #         "source": j,
-            #         "target": i,
-            #         "value": val,
-            #     }
-            # )
+            links_for_name[i] += 1
+            links_for_name[j] += 1
 
-with open(f"graph_{len(graph_names)}_top{TOP_PERC_LINKS}.json", "w") as f:
-    json.dump(data, f, indent=2)
-
-# %%
-
-
-TOP_TO_TAKE = 3
-
-data = {
-    "nodes": [{"id": i, "name": n} for (i, n) in enumerate(graph_names)],
-    "links": [],
-}
-
-for i in tqdm(range(len(graph_names))):
-    g_sorted = np.argsort(graph[i])
-    for j in g_sorted[1 : TOP_TO_TAKE + 1]:
+for nameidx, count in links_for_name.items():
+    if count == 0:
+        max_friend = np.argmax(graph[nameidx])
         data["links"].append(
             {
-                "source": int(i),
-                "target": int(j),
-                "value": graph[i][j],
+                "source": nameidx,
+                "target": int(max_friend),
+                "value": graph[nameidx][max_friend],
             }
         )
 
-with open(f"graph2_{len(graph_names)}_top{TOP_TO_TAKE}.json", "w") as f:
-    json.dump(data, f, indent=2)
+with open(f"graph_{gender}_{len(graph_names)}_top{TOP_PERC_LINKS}.json", "w") as f:
+    json.dump(data, f)
 
 # %%
