@@ -18,11 +18,15 @@ function App() {
   const loaded_datasources = {}
 
   const [linkVis, setLinkVis] = React.useState(false);
+  const [pointerInteraction, setPointerInteraction] = React.useState(true);
   const [data, setData] = React.useState(datasources[0][1])
 
 
   function toggleLinkVis() {
     setLinkVis(!linkVis)
+  }
+  function togglePointerInteraction() {
+    setPointerInteraction(!pointerInteraction)
   }
 
   function dropdownChanged(e) {
@@ -41,7 +45,7 @@ function App() {
         linkOpacity={0.05}
         warmupTicks={10}
         cooldownTime={20000}
-        enablePointerInteraction={false}
+        enablePointerInteraction={pointerInteraction}
         enableNodeDrag={false}
         nodeThreeObject={node => {
           const sprite = new SpriteText(node.name);
@@ -57,6 +61,11 @@ function App() {
           label="Show links"
           value={linkVis}
           onChange={toggleLinkVis}
+        />
+        <Checkbox
+          label="Pointer interaction"
+          value={pointerInteraction}
+          onChange={togglePointerInteraction}
         />
       </div><div>
         <Form.Select aria-label="Default select example" onChange={dropdownChanged}>
