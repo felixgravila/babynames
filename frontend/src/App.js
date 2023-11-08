@@ -62,6 +62,7 @@ function App() {
           value={linkVis}
           onChange={toggleLinkVis}
         />
+      </div><div>
         <Checkbox
           label="Pointer interaction"
           value={pointerInteraction}
