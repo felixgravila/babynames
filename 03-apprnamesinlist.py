@@ -47,6 +47,7 @@ plt.yticks([])
 xticks = [x * 5000 // scale_factor for x in range(floor(len(sortednames) / 5000) + 1)]
 plt.xticks(xticks, [x * scale_factor for x in xticks])
 plt.title("Location of DK approved names in ordered list of all US names")
+plt.xlabel("Location in US name list by popularity index (0 is most popular US name)")
 plt.savefig("DKpopularity.png")
 plt.show()
 

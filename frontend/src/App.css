@@ -44,14 +44,30 @@
 }
 
 #graphdiv {
-  height: 100%;
-  width: calc(100% - 150px);
   flex: 1;
 }
 
-#selectdiv {
+.graphwide {
   height: 100%;
-  width: 130px;
+  width: calc(100% - 150px);
+}
+
+.graphtall {
+  height: calc(100% - 70px);
+  width: 100%;
+}
+
+#selectdiv {
   flex: 1;
   padding: 10px;
+}
+
+.selectdivwide {
+  height: 100%;
+  width: 130px;
+}
+
+.selectdivtall {
+  height: 50px;
+  width: 100%;
 }

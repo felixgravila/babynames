@@ -15,6 +15,9 @@ function App() {
     ["Boys top 963 5% links", require("./graph_M_963_top0.05.json")],
   ]
 
+  const isThin = (window.innerHeight / window.innerWidth) < 0.9;
+
+
   const loaded_datasources = {}
 
   const [linkVis, setLinkVis] = React.useState(false);
@@ -34,12 +37,13 @@ function App() {
   }
 
 
+
   return <div id="bigdiv">
-    <div id="graphdiv">
+    <div id="graphdiv" className={`${isThin ? "graphtall" : "graphwide"}`}>
       <ForceGraph3D
         graphData={data}
         width={window.innerWidth - 200}
-        height="100%"
+        height={window.innerHeight - 70}
         linkVisibility={linkVis}
         linkResolution={1}
         linkOpacity={0.05}
@@ -55,7 +59,7 @@ function App() {
         }}
       />
     </div>
-    <div id="selectdiv">
+    <div id="selectdiv" className={`${isThin ? "selectdivtall" : "selectdivwide"}`}>
       <div>
         <Checkbox
           label="Show links"
@@ -72,7 +76,7 @@ function App() {
         <Form.Select aria-label="Default select example" onChange={dropdownChanged}>
           {
             datasources.map((d, idx) => {
-              return <option value={idx}>{d[0]}</option>
+              return <option key={idx} value={idx}>{d[0]}</option>
             })
           }
         </Form.Select>
